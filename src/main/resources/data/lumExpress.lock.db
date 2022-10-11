@@ -1,0 +1,6 @@
+#FileLock
+#Tue Oct 11 21:16:50 WAT 2022
+hostName=kali
+id=183c8b15d56ec10084597927dde30add5a06d2af1fa
+method=file
+server=127.0.1.1\:45465
