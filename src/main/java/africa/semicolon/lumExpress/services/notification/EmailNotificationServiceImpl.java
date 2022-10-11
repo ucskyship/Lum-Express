@@ -1,6 +1,6 @@
 package africa.semicolon.lumExpress.services.notification;
 
-import africa.semicolon.lumExpress.data.models.EmailDetails;
+import africa.semicolon.lumExpress.data.dtos.request.EmailNotificationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -11,21 +11,21 @@ import javax.mail.internet.MimeMessage;
 
 @Service
 @AllArgsConstructor
-public class EmailSenderImpl implements iEmailSender{
+public class EmailNotificationServiceImpl implements iEmailNotificationService {
     private final JavaMailSender javaMailSender;
     @Override
-    public String sendHtmlMail(EmailDetails emailDetails) {
+    public String sendHtmlMail(EmailNotificationRequest emailNotificationRequest) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
         try {
             mimeMessageHelper.setFrom("no-reply@gmail.com.lumExpress.com.org");
-            mimeMessageHelper.setTo(emailDetails.getUserEmail());
-            mimeMessageHelper.setText(emailDetails.getMailContent(), true);
+            mimeMessageHelper.setTo(emailNotificationRequest.getUserEmail());
+            mimeMessageHelper.setText(emailNotificationRequest.getMailContent(), true);
             javaMailSender.send(mimeMessage);
-            return String.format("email sent to %s successfully", emailDetails.getUserEmail());
+            return String.format("email sent to %s successfully", emailNotificationRequest.getUserEmail());
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-        return String.format("email not sent to %s", emailDetails.getUserEmail());
+        return String.format("email not sent to %s", emailNotificationRequest.getUserEmail());
     }
 }

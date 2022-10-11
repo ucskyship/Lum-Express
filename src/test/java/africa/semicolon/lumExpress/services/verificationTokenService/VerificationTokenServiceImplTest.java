@@ -1,7 +1,6 @@
 package africa.semicolon.lumExpress.services.verificationTokenService;
 
 import africa.semicolon.lumExpress.data.models.VerificationToken;
-import africa.semicolon.lumExpress.data.repositories.VerificationTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -27,10 +25,19 @@ class VerificationTokenServiceImplTest {
     }
 
     @Test
-    void generateVerificationTokenTest() {
-        VerificationToken verificationToken = verificationTokenService.generateVerificationToken("test@gmail.com");
-        log.info("verified token::{}", verificationToken);
+    void createTokenTest() {
+        VerificationToken verificationToken = verificationTokenService.createToken("test@gmail.com");
+        log.info("verified token object::{}", verificationToken);
         assertThat(verificationToken).isNotNull();
         assertThat(verificationToken.getToken().length()).isEqualTo(5);
+        assertThat(verificationToken.getUserEmail()).isEqualTo("test@gmail.com");
+    }
+
+    @Test
+    void isValidVerificationTokenTest(){
+        var verificationToken = verificationTokenService.createToken("test@gmail.com");
+        assertThat(verificationToken).isNotNull();
+        var response = verificationTokenService.isValidVerificationToken(verificationToken.getToken());
+        assertThat(response).isTrue();
     }
 }
