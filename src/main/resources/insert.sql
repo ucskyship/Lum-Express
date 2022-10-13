@@ -1,1 +1,1 @@
-insert into customer values (500L, 'test@gmail.com', NULL, 'test password', NULL, 'Josh', 'Joe');
+insert into customer values (500, 'test@gmail.com', NULL, 'test password', NULL, 'Josh', 'Joe', NULL, NULL);

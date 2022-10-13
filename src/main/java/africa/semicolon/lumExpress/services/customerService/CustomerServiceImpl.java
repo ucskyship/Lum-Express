@@ -9,6 +9,7 @@ import africa.semicolon.lumExpress.data.models.Cart;
 import africa.semicolon.lumExpress.data.models.Customer;
 import africa.semicolon.lumExpress.data.models.VerificationToken;
 import africa.semicolon.lumExpress.data.repositories.CustomerRepository;
+import africa.semicolon.lumExpress.exceptions.UserNotFoundException;
 import africa.semicolon.lumExpress.services.notification.iEmailNotificationService;
 import africa.semicolon.lumExpress.services.verificationTokenService.VerificationTokenServiceImpl;
 import lombok.AllArgsConstructor;
@@ -38,16 +39,18 @@ public class CustomerServiceImpl implements iCustomerService {
         var savedCustomer = customerRepository.save(customer);
         log.info("customer to be saved in db::{}", savedCustomer);
         var token = verificationTokenService.createToken(savedCustomer.getEmail());
-        emailNotificationService.sendHtmlMail(buildEmailNotificationRequest(token));
+        emailNotificationService.sendHtmlMail(buildEmailNotificationRequest(token, savedCustomer.getFirstname()));
         return registrationResponseBuilder(savedCustomer);
     }
 
-    private EmailNotificationRequest buildEmailNotificationRequest(VerificationToken verificationToken) {
+    private EmailNotificationRequest buildEmailNotificationRequest(VerificationToken verificationToken, String customerName) {
         var email = getEmailTemplate();
         String mail = null;
         if (email != null){
             //TODO: remove hard-code url to environment
-            mail = String.format(email, verificationToken.getUserEmail(), "http://localhost:8080/api/v1/customer/verify/" + verificationToken.getToken());
+            var verificationUrl = "http://localhost:8080/api/v1/customer/verify/" + verificationToken.getToken();
+            mail = String.format(email, customerName,  verificationUrl);
+            log.info("mailed url::{}", verificationUrl);
         }
         return EmailNotificationRequest.builder()
                 .userEmail(verificationToken.getUserEmail())
@@ -56,7 +59,8 @@ public class CustomerServiceImpl implements iCustomerService {
     }
 
     private String getEmailTemplate(){
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("/home/ucj/Downloads/LumExpress-main/src/main/resources/welcome.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(
+                "/home/ucj/Documents/SEMICOLON/IdeaProjects/LumExpress/src/main/resources/welcome.txt"))) {
             return bufferedReader.lines().collect(Collectors.joining());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -79,7 +83,12 @@ public class CustomerServiceImpl implements iCustomerService {
     }
 
     @Override
-    public String completeProfile(UpdateCustomerDetails updateCustomerDetails) {
-        return null;
+    public String updateProfile(UpdateCustomerDetails updateCustomerDetails) {
+        Customer customerToUpdate = customerRepository.findById(updateCustomerDetails.getCustomerId()).orElseThrow(
+                ()-> new UserNotFoundException(String.format("user with id %d not found", updateCustomerDetails.getCustomerId())));
+        log.info("initial details before update::{}", customerToUpdate);
+        modelMapper.map(updateCustomerDetails, customerToUpdate);
+        log.info("updated details -->{}", customerToUpdate);
+        return "success";
     }
 }

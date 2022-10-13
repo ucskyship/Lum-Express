@@ -8,8 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class UpdateCustomerDetails {
-    private String firstname;
-    private Long email;
+    private Long customerId;
     private String lastName;
     private String phoneNumber;
     private String imageUrl;

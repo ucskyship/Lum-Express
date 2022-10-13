@@ -32,7 +32,7 @@ class ProductServiceImplTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        Path path = Paths.get("/home/ucj/Downloads/LumExpress-main/src/test/images/peak.jpeg");
+        Path path = Paths.get("/home/ucj/Documents/SEMICOLON/IdeaProjects/LumExpress/src/test/images/peak.jpeg");
         MultipartFile file = new MockMultipartFile("peak", Files.readAllBytes(path));
 
         request = buildAddProductRequest(file);
