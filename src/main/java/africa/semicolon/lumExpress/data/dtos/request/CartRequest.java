@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetAllElementRequest {
-    private int numberOfProductPerPage;
-    private int pageNumber;
+public class CartRequest {
+    private Long cartId;
+    private Long productId;
 }

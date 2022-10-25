@@ -17,8 +17,6 @@ class UserServiceImplTest {
     iCustomerService customerService;
     @Autowired
     private iUserService userService;
-
-    private CustomerRegistrationRequest registerRequest;
     private LoginRequest loginRequest;
 
     @BeforeEach
@@ -35,7 +33,7 @@ class UserServiceImplTest {
 
     @Test
     void loginTest() {
-        registerRequest = CustomerRegistrationRequest
+        CustomerRegistrationRequest registerRequest = CustomerRegistrationRequest
                 .builder()
                 .email("fanalas844@inkmoto.com")
                 .password("123456")

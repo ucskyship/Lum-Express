@@ -31,7 +31,7 @@ class VerificationTokenRepositoryTest {
     }
 
     @Test
-    void findByUserEmail() {
+    void findByUserEmail() throws VerificationTokenException {
         verificationTokenRepository.save(verificationToken);
         var foundToken = verificationTokenRepository.findByUserEmail("test@gmail.com").orElseThrow(
                 () -> new VerificationTokenException("token not found"));

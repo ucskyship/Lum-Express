@@ -10,9 +10,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Setter
 @Getter
 public class Notification {

@@ -1,7 +1,7 @@
 package africa.semicolon.lumExpress.services.productService;
 
 import africa.semicolon.lumExpress.data.dtos.request.AddProductRequest;
-import africa.semicolon.lumExpress.data.dtos.request.GetAllElementRequest;
+import africa.semicolon.lumExpress.data.dtos.request.GetAllItemsRequest;
 import africa.semicolon.lumExpress.data.dtos.response.AddProductResponse;
 import africa.semicolon.lumExpress.data.dtos.response.UpdateProductResponse;
 import africa.semicolon.lumExpress.data.models.Category;
@@ -57,7 +57,7 @@ public class ProductServiceImpl implements iProductService {
     }
 
     @Override
-    public UpdateProductResponse updateProductDetails(Long productId, JsonPatch patch) throws JsonPatchException {
+    public UpdateProductResponse updateProductDetails(Long productId, JsonPatch patch) throws JsonPatchException, ProductNotFoundException {
 //        find product
         var foundProduct = productRepository.findById(productId).orElseThrow(
                 () -> new ProductNotFoundException(String.format("product with id %d not found", productId)));
@@ -94,15 +94,15 @@ public class ProductServiceImpl implements iProductService {
     }
 
     @Override
-    public Product getProductById(Long id) {
+    public Product getProductById(Long id) throws ProductNotFoundException {
         return productRepository.findById(id).orElseThrow(
                 () -> new ProductNotFoundException(String.format("product %d not found", id)));
     }
 
     @Override
-    public Page<Product> getAllProducts(GetAllElementRequest getAllElementRequest) {
+    public Page<Product> getAllProducts(GetAllItemsRequest getAllItemsRequest) {
         Pageable pageSpecs = PageRequest.of(
-                getAllElementRequest.getPageNumber() - 1, getAllElementRequest.getNumberOfProductPerPage());
+                getAllItemsRequest.getPageNumber() - 1, getAllItemsRequest.getNumberOfProductPerPage());
         return productRepository.findAll(pageSpecs);
     }
 

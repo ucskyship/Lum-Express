@@ -1,4 +1,4 @@
-package africa.semicolon.lumExpress.services;
+package africa.semicolon.lumExpress.services.customerService;
 
 import africa.semicolon.lumExpress.data.dtos.request.CustomerRegistrationRequest;
 import africa.semicolon.lumExpress.data.dtos.request.UpdateCustomerDetails;
@@ -19,7 +19,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class CustomerServiceImplTest {
     @Autowired
     iCustomerService customerService;
-
     private CustomerRegistrationRequest registerRequest;
 
     @BeforeEach
@@ -46,7 +45,7 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void updateProfile() {
+    void completeCustomerProfileTest() {
         CustomerRegistrationResponse response = customerService.register(registerRequest);
         UpdateCustomerDetails updateDetails = UpdateCustomerDetails
                 .builder()
@@ -54,8 +53,12 @@ class CustomerServiceImplTest {
                 .imageUrl(LumExpressUtils.getMockCloudinaryImageUrl())
                 .lastName("test lastname")
                 .phoneNumber("99999999")
+                .city("Yaba")
+                .state("Lagos")
+                .street("Herbert Marculy")
+                .buildingNumber(312)
                 .build();
-        var updateResponse = customerService.updateProfile(updateDetails);
+        var updateResponse = customerService.completeCustomerProfile(updateDetails);
         assertThat(updateResponse).isNotNull();
         assertThat(updateResponse.contains("success")).isTrue();
     }

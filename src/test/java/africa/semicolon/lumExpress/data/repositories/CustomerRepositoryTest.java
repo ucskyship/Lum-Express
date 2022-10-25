@@ -20,7 +20,7 @@ class CustomerRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        customerRepository.deleteAll();
+//        customerRepository.deleteAll();
     }
 
     @AfterEach

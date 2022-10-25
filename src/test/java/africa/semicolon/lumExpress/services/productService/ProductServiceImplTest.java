@@ -1,9 +1,15 @@
-package africa.semicolon.lumExpress.services;
+package africa.semicolon.lumExpress.services.productService;
 
 import africa.semicolon.lumExpress.data.dtos.request.AddProductRequest;
-import africa.semicolon.lumExpress.data.dtos.request.GetAllElementRequest;
+import africa.semicolon.lumExpress.data.dtos.request.GetAllItemsRequest;
 import africa.semicolon.lumExpress.data.dtos.response.AddProductResponse;
+import africa.semicolon.lumExpress.data.dtos.response.UpdateProductResponse;
 import africa.semicolon.lumExpress.services.productService.iProductService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jackson.jsonpointer.JsonPointer;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.ReplaceOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +24,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +48,7 @@ class ProductServiceImplTest {
 
     @AfterEach
     void tearDown() {
-        productService.deleteALl();
+//        productService.deleteALl();
     }
 
     @Test
@@ -82,7 +89,7 @@ class ProductServiceImplTest {
         var getItemRequest = buildGetAllElementRequest();
         var productPage = productService.getAllProducts(getItemRequest);
         log.info("page contents::{}", productPage);
-        assertEquals(1L, productService.count());
+        assertEquals(2L, productService.count());
     }
 
     @Test
@@ -103,8 +110,8 @@ class ProductServiceImplTest {
                 .build();
     }
 
-    private GetAllElementRequest buildGetAllElementRequest() {
-        return GetAllElementRequest
+    private GetAllItemsRequest buildGetAllElementRequest() {
+        return GetAllItemsRequest
                 .builder()
                 .numberOfProductPerPage(8)
                 .pageNumber(1)

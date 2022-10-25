@@ -9,17 +9,21 @@ import africa.semicolon.lumExpress.data.models.Cart;
 import africa.semicolon.lumExpress.data.models.Customer;
 import africa.semicolon.lumExpress.data.models.VerificationToken;
 import africa.semicolon.lumExpress.data.repositories.CustomerRepository;
+import africa.semicolon.lumExpress.exceptions.LumExpressException;
 import africa.semicolon.lumExpress.exceptions.UserNotFoundException;
 import africa.semicolon.lumExpress.services.notification.iEmailNotificationService;
 import africa.semicolon.lumExpress.services.verificationTokenService.VerificationTokenServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,11 +35,17 @@ public class CustomerServiceImpl implements iCustomerService {
     private final VerificationTokenServiceImpl verificationTokenService;
     private final iEmailNotificationService emailNotificationService;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Override
-    public CustomerRegistrationResponse register(CustomerRegistrationRequest registerRequest) {
+    public CustomerRegistrationResponse register(CustomerRegistrationRequest registerRequest) throws LumExpressException {
+        var foundCustomer = customerRepository.findByEmail(registerRequest.getEmail());
+        if (foundCustomer.isPresent()) throw new LumExpressException(String.format("user with email %s, already in use", registerRequest.getEmail()));
         var customer = modelMapper.map(registerRequest, Customer.class);
         customer.setCart(new Cart());
         setCustomerAddress(registerRequest, customer);
+        var encodedPassword = passwordEncoder.encode(customer.getPassword());
+        customer.setPassword(encodedPassword);
         var savedCustomer = customerRepository.save(customer);
         log.info("customer to be saved in db::{}", savedCustomer);
         var token = verificationTokenService.createToken(savedCustomer.getEmail());
@@ -83,12 +93,31 @@ public class CustomerServiceImpl implements iCustomerService {
     }
 
     @Override
-    public String updateProfile(UpdateCustomerDetails updateCustomerDetails) {
+    public String completeCustomerProfile(UpdateCustomerDetails updateCustomerDetails) throws UserNotFoundException {
         Customer customerToUpdate = customerRepository.findById(updateCustomerDetails.getCustomerId()).orElseThrow(
                 ()-> new UserNotFoundException(String.format("user with id %d not found", updateCustomerDetails.getCustomerId())));
         log.info("initial details before update::{}", customerToUpdate);
         modelMapper.map(updateCustomerDetails, customerToUpdate);
         log.info("updated details -->{}", customerToUpdate);
-        return "success";
+        var customerToAddressList = customerToUpdate.getAddress();
+        var foundAddress = customerToAddressList.stream().findFirst();
+        if (foundAddress.isPresent()) applyAddressUpdate(updateCustomerDetails, foundAddress.get());
+        customerToUpdate.getAddress().add(foundAddress.get());
+        var savedUpdate = customerRepository.save(customerToUpdate);
+        log.info("updated details -->{}", customerToUpdate);
+        return String.format("%s details updated successfully", updateCustomerDetails.getFirstName());
     }
+
+    @Override
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
+    }
+
+    private void applyAddressUpdate(UpdateCustomerDetails updateCustomerDetails, Address address) {
+        address.setBuildingNumber(updateCustomerDetails.getBuildingNumber());
+        address.setStreet(updateCustomerDetails.getStreet());
+        address.setCity(updateCustomerDetails.getCity());
+        address.setState(updateCustomerDetails.getState());
+    }
+
 }

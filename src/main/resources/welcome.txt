@@ -3,6 +3,6 @@ We say THANK YOU for choosing Lum Express.
 On this occasion,
 we charge you to shop for the harmony,
 happiness, and prosperity of your existence, with heart and soul.
-Please user the link below to activate your account<br/>
+Please use the link below to activate your account<br/>
 <a href=%s> Activate </a>
 </p>
